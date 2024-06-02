@@ -1,8 +1,9 @@
 # cython: language_level=3
 # cython: cdivision=True
 # distutils: language=c++
-from libc.stdint cimport int32_t, int64_t, uint32_t
 from libc.stddef cimport wchar_t
+from libc.stdint cimport int32_t, int64_t, uint32_t
+
 
 cdef extern from "NativeApi.h" nogil:
     """
