@@ -6,9 +6,6 @@ from libc.stdint cimport int32_t, int64_t, uint32_t
 
 
 cdef extern from "NativeApi.h" nogil:
-    """
-#define LibSvcApi __declspec(dllimport)
-    """
     ctypedef void(*ProgCallback)(size_t, size_t)
     enum LibSvcExecutionProviders:
         CPU
@@ -45,8 +42,22 @@ cdef extern from "NativeApi.h" nogil:
         wchar_t* Sampler                 #Diffusion采样器
         wchar_t* ReflowSampler           #Reflow采样器
         wchar_t* F0Method                #F0提取算法
-        int32_t UseShallowDiffusion                 #使用浅扩散
-        void* _VocoderModel
+        int32_t UseShallowDiffusionOrEnhancer                 #使用浅扩散
+        void * _VocoderModel;
+        # 声码器模型
+        # Diffusion模型必须设定该项目
+        void * _ShallowDiffusionModel;
+        # 扩散模型
+        # 浅扩散必需设置为扩散模型地址
+        int32_t ShallowDiffusionUseSrcAudio;
+        # 浅扩散模型是否使用原始音频        [0(false) / 1(true)]
+        int32_t VocoderHopSize;
+        # 声码器HopSize                [Hop]
+        int32_t VocoderMelBins;
+        # 声码器MelBins                [Bins]
+        int32_t VocoderSamplingRate;
+        # 声码器采样率                [SR]
+        int64_t ShallowDiffuisonSpeaker;
 
     struct DiffusionSvcPaths:
         wchar_t* Encoder
@@ -225,21 +236,16 @@ cdef extern from "NativeApi.h" nogil:
 		Int16Vector _Output #std::vector<int16_t> By "LibSvcAllocateAudio()"
 	)
 
-    int32_t LibSvcShallowDiffusionInference(
-		SvcModel _Model, #SingingVoiceConversion Model
-		FloatVector _16KAudioHubert,
-		MelType _Mel, #Mel By "LibSvcAllocateMel()"
-		CFloatVector _SrcF0,
-		CFloatVector _SrcVolume,
-		CDoubleDimsFloatVector _SrcSpeakerMap,
-		int64_t _SrcSize,
-		const void* _InferParams, #Ptr Of LibSvcParams
-		size_t* _Process,
-		Int16Vector _Output #std::vector<int16_t> By "LibSvcAllocateAudio()"
+    int32_t LibSvcInferPCMData(
+		SvcModel _Model,						# SingingVoiceConversion Model
+		uint32_t _T,
+		CInt16Vector _PCMData,
+		const void* _InferParams,					# Ptr Of LibSvcParams
+		Int16Vector _Output							# std::vector<int16_t> By "LibSvcAllocateAudio()"
 	)
 
     int32_t LibSvcVocoderEnhance(
-		VocoderModel _Model, #Vocoder Model
+		VocoderModel _Model, #Vocoder Model  todo Deprecated
 		MelType _Mel, #Mel By "LibSvcAllocateMel()"
 		FloatVector _F0,
 		int32_t _VocoderMelBins,

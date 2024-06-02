@@ -30,11 +30,12 @@ extensions = [
     Extension(
         "pyvoice._svc",
         ["pyvoice/_svc.pyx"],
-        include_dirs=[f"./DragonianVoice/libsvc/Api/header"],
-        # library_dirs=[f"./lib的目录"],
-        # extra_objects=["./libsvc.lib"], todo lib呢？
+        include_dirs=[f"./dep/Native"],
+        library_dirs=[f"./dep/static"],
+        # libraries=["libsvc"],
+        extra_objects=["./dep/bins/libsvc.lib"],
         define_macros=[("UNICODE", None)],
-        language="c++"
+        language="c++",
     ),
 ]
 
